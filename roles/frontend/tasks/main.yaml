@@ -37,14 +37,14 @@
   command: npm cache clean --force
   become_user: "{{ app_user }}"
 
-- name: Clone backend repo to temp directory
+- name: Clone frontend repo to temp directory
   git:
-    repo: "{{ backend_repo_url }}"
+    repo: "{{ frontend_repo_url }}"
     dest: "/tmp/contact-manager"
-    version: "{{ backend_branch }}"
+    version: "{{ frontend_branch }}"
     force: yes
 
-- name: Ensure /app/backend exists
+- name: Ensure /app/frontend exists
   file:
     path: "{{ app_dir }}"
     state: directory
