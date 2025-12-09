@@ -38,6 +38,11 @@
   command: npm cache clean --force
   become_user: "{{ app_user }}"
 
+- name: Install git
+  ansible.builtin.package:
+    name: git
+    state: present
+
 - name: Clone frontend repo to temp directory
   git:
     repo: "{{ frontend_repo_url }}"
