@@ -64,7 +64,13 @@
     path: "{{ backend_workdir }}"
     state: present
 
+- name: Build TypeScript to JavaScript
+  ansible.builtin.shell: npm run build
+  args:
+    chdir: "{{ backend_workdir }}"
+  become_user: "{{ app_user }}"
 
+  
 - name: Start backend using PM2
   ansible.builtin.shell: |
     pm2 stop {{ service_name }} || true
