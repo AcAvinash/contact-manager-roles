@@ -39,11 +39,11 @@
 
 - name: Ensure /app/backend exists
   file:
-    path: "{{ app_dir }}/{{ service_name }}"
+    path: "{{ app_dir }}"
     state: directory
 
 - name: Move backend folder from temp to /app/backend
-  command: mv /tmp/contact-manager/backend "{{ app_dir }}/{{ service_name }}"
+  command: mv /tmp/contact-manager/backend "{{ app_dir }}"
 
 - name: Remove temp repo folder
   file:
@@ -52,7 +52,7 @@
 
 - name: Set backend working directory
   set_fact:
-    backend_workdir: "{{ app_dir }}/{{ service_name }}"
+    backend_workdir: "{{ app_dir }}"
 
 - name: Debug backend path
   debug:
