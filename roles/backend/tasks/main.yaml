@@ -83,10 +83,13 @@
   template:
     src: env.j2
     dest: "{{ backend_workdir }}/.env"
-    mode: "0600"
+    owner: "{{ app_user }}"  # Yeh add karo
+    group: "{{ app_user }}"  # Yeh add karo
+    mode: "0640"  # Change to 0640
+    force: yes
   vars:
     secrets: "{{ secrets }}"
-  notify: Restart backend          
+  notify: Restart backend       
 
 - name: Build TypeScript code
   ansible.builtin.shell: "./node_modules/.bin/tsc"
