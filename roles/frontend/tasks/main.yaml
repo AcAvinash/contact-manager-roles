@@ -100,6 +100,10 @@
     chdir: "{{ frontend_workdir }}"
   become_user: "{{ app_user }}"
 
+- name: Enable Nginx extras repo
+  ansible.builtin.shell: amazon-linux-extras enable nginx1
+  become: true
+
 #  Install Nginx
 - name: Install Nginx
   ansible.builtin.yum:
