@@ -73,7 +73,7 @@
 - name: Start backend using PM2
   ansible.builtin.shell: |
     pm2 stop {{ service_name }} || true
-    pm2 start {{ backend_workdir }}/dist/server.js --name {{ service_name }} --update-env
+    pm2 start {{ backend_workdir }}/server.js --name {{ service_name }} --update-env
     pm2 save
 
 
