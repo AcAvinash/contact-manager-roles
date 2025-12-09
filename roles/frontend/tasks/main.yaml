@@ -98,6 +98,13 @@
     name: nginx
     state: present
 
+- name: Ensure Nginx is running
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: yes
+
+
 - name: Configure Nginx for Frontend
   template:
     src: frontend.j2
