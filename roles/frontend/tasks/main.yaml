@@ -1,6 +1,6 @@
-
-# Create swap file (2 GB) to avoid memory issues during build
-- name: Create swap file
+---
+#  Create swap file (optional for low-memory EC2)
+- name: Create swap file (2 GB)
   ansible.builtin.shell: |
     dd if=/dev/zero of=/swapfile bs=1M count=2048
     chmod 600 /swapfile
@@ -9,40 +9,43 @@
   args:
     creates: /swapfile
 
-
-
-
+#  Create application user
 - name: Create application user
   ansible.builtin.import_role:
     name: common
     tasks_from: user-setup
 
+#  Setup application directory
 - name: Setup application directory
   ansible.builtin.import_role:
     name: common
     tasks_from: app-setup
 
-
+#  Install NodeJS
 - name: Install NodeJS
   ansible.builtin.import_role:
     name: common
     tasks_from: nodejs
 
+#  Remove old node_modules if any
 - name: Remove old node_modules
   file:
     path: "{{ app_dir }}/node_modules"
     state: absent
   become_user: "{{ app_user }}"
 
+#  Clean npm cache
 - name: Clean npm cache
   command: npm cache clean --force
   become_user: "{{ app_user }}"
 
+#  Install git
 - name: Install git
   ansible.builtin.package:
     name: git
     state: present
 
+#  Clone frontend repo
 - name: Clone frontend repo to temp directory
   git:
     repo: "{{ frontend_repo_url }}"
@@ -50,47 +53,52 @@
     version: "{{ frontend_branch }}"
     force: yes
 
+#  Ensure /app exists
 - name: Ensure /app exists
   file:
     path: "{{ app_dir }}"
     state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
 
-- name: Fix permissions of temp repo for roboshop
+# Fix permissions of temp repo for roboshop
+- name: Fix permissions of temp repo
   file:
     path: /tmp/contact-manager
     state: directory
     recurse: yes
-    owner: roboshop
-    group: roboshop
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
 
-
-- name: Move client folder from temp to /app
+# Move client folder from temp to /app
+- name: Move client folder to /app
   command: rsync -a /tmp/contact-manager/client/ "{{ app_dir }}"
   become_user: "{{ app_user }}"
 
+# Remove temp folder
 - name: Remove temp repo folder
   file:
     path: /tmp/contact-manager
     state: absent
 
+# Set frontend_workdir
 - name: Set frontend working directory
   set_fact:
     frontend_workdir: "{{ app_dir }}"
-  become_user: "{{ app_user }}"
 
+#  Install frontend dependencies
 - name: Install frontend dependencies
   npm:
     path: "{{ frontend_workdir }}"
     state: present
   become_user: "{{ app_user }}"
 
+#  Build React App
 - name: Build React App
   command: npm run build
   args:
     chdir: "{{ frontend_workdir }}"
   become_user: "{{ app_user }}"
-
-
 
 #  Install Nginx
 - name: Install Nginx
@@ -98,16 +106,19 @@
     name: nginx
     state: present
 
+#  Ensure Nginx is running
 - name: Ensure Nginx is running
   ansible.builtin.service:
     name: nginx
     state: started
     enabled: yes
 
-
+# Configure Nginx for frontend
 - name: Configure Nginx for Frontend
   template:
     src: frontend.j2
     dest: /etc/nginx/conf.d/frontend.conf
     mode: '0644'
   notify: Restart Nginx
+
+
