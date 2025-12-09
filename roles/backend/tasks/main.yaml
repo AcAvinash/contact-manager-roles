@@ -62,7 +62,7 @@
 
 - name: Decrypt secrets.yaml
   include_vars:
-    file: "secrets/secrets.yaml"
+    file: "secret/secrets.yaml"
     name: secrets
   no_log: true
 
