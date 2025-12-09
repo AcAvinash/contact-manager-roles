@@ -64,7 +64,7 @@
   include_vars:
     file: "secret/secrets.yaml"
     name: secrets
-  no_log: true
+  no_log: false
 
 - name: Create .env file using template
   template:
