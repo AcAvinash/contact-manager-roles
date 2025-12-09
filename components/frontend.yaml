@@ -1,8 +1,0 @@
-# Frontend — no secrets needed
-- name: Deploy Frontend
-  hosts: frontend
-  become: yes
-  roles:
-    - role: frontend
-      tags:
-        - frontend

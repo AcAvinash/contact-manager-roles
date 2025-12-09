@@ -1,22 +1,8 @@
----
-- name: Component Dispatcher
-  hosts: localhost
-  gather_facts: no
-  vars:
-    component: "{{ component | default('all') }}"
-
-  tasks:
-
-    - name: Run backend component
-      include_tasks: components/backend.yaml
-      when: component == "backend" or component == "all"
-
-    - name: Run frontend component
-      include_tasks: components/frontend.yaml
-      when: component == "frontend" or component == "all"
-
-
-
+- name: Installing contactmanager app
+  hosts: "{{ component }}"
+  become: yes
+  roles:
+    - "{{ component }}"
 
 
     

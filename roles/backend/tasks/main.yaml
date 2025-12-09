@@ -1,5 +1,9 @@
 ---
 
+- name: Load backend secrets
+  include_vars: "{{ playbook_dir }}/secret/secrets.yaml"
+  when: load_backend_vault | default(false)
+
 - name: Create application user
   ansible.builtin.import_role:
     name: common
