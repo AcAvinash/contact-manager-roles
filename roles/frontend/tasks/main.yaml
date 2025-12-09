@@ -102,9 +102,11 @@
 
 #  Install Nginx
 - name: Install Nginx
-  yum:
+  ansible.builtin.yum:
     name: nginx
     state: present
+  become: true
+  
 
 #  Ensure Nginx is running
 - name: Ensure Nginx is running
