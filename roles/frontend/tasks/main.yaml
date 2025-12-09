@@ -102,6 +102,11 @@
     chdir: "{{ frontend_workdir }}"
   become_user: "{{ app_user }}"
 
+- name: Ensure EPEL repo is installed (AL2023)
+  ansible.builtin.yum:
+    name: epel-release
+    state: present
+
 # Install Nginx
 - name: Install Nginx
   ansible.builtin.yum:
