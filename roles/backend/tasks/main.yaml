@@ -34,7 +34,7 @@
 
 - name: Set backend working directory dynamically
   set_fact:
-    backend_workdir: "{{ app_dir }}/{{ service_name }}/{{ backend_subpath }}"
+    backend_workdir: "{{ app_dir }}/{{ service_name }}"
 
 - name: Debug backend path
   debug:
