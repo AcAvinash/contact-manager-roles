@@ -25,14 +25,27 @@
     state: present
 
 
-- name: Clone backend repository
+- name: Clone backend repo to temp directory
   git:
     repo: "{{ backend_repo_url }}"
-    dest: "{{ app_dir }}/{{ service_name }}"
+    dest: "/tmp/contact-manager"
     version: "{{ backend_branch }}"
     force: yes
 
-- name: Set backend working directory dynamically
+- name: Ensure /app/backend exists
+  file:
+    path: "{{ app_dir }}/{{ service_name }}"
+    state: directory
+
+- name: Move backend folder from temp to /app/backend
+  command: mv /tmp/contact-manager/backend "{{ app_dir }}/{{ service_name }}"
+
+- name: Remove temp repo folder
+  file:
+    path: /tmp/contact-manager
+    state: absent
+
+- name: Set backend working directory
   set_fact:
     backend_workdir: "{{ app_dir }}/{{ service_name }}"
 
@@ -44,6 +57,7 @@
   npm:
     path: "{{ backend_workdir }}"
     state: present
+
 
 - name: Start backend using PM2
   ansible.builtin.shell: |
