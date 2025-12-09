@@ -21,6 +21,8 @@
     name: common
     tasks_from: app-setup
 
+
+
 #  Install NodeJS
 - name: Install NodeJS
   ansible.builtin.import_role:
@@ -100,16 +102,19 @@
     chdir: "{{ frontend_workdir }}"
   become_user: "{{ app_user }}"
 
-- name: Enable Nginx extras repo
-  ansible.builtin.shell: amazon-linux-extras enable nginx1
-  become: true
+- name: Install EPEL repo (for nginx)
+  ansible.builtin.yum:
+    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    state: present
 
-#  Install Nginx
 - name: Install Nginx
   ansible.builtin.yum:
     name: nginx
     state: present
   become: true
+
+
+
   
 
 #  Ensure Nginx is running
