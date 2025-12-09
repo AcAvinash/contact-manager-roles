@@ -42,12 +42,12 @@
     version: "{{ backend_branch }}"
     force: yes
 
-- name: Ensure /app/backend exists
+- name: Ensure /app exists
   file:
     path: "{{ app_dir }}"
     state: directory
 
-- name: Move backend folder from temp to /app/backend
+- name: Move backend folder from temp to /app
   command: rsync -a /tmp/contact-manager/backend/ "{{ app_dir }}"
 
 - name: Remove temp repo folder

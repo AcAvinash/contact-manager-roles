@@ -43,7 +43,7 @@
     name: git
     state: present
 
-- name: Clone backend repo to temp directory
+- name: Clone frontend repo to temp directory
   git:
     repo: "{{ frontend_repo_url }}"
     dest: "/tmp/contact-manager"
@@ -55,7 +55,16 @@
     path: "{{ app_dir }}"
     state: directory
 
-- name: Move backend folder from temp to /app
+- name: Fix permissions of temp repo for roboshop
+  file:
+    path: /tmp/contact-manager
+    state: directory
+    recurse: yes
+    owner: roboshop
+    group: roboshop
+
+
+- name: Move client folder from temp to /app
   command: rsync -a /tmp/contact-manager/client/ "{{ app_dir }}"
 
 - name: Remove temp repo folder
