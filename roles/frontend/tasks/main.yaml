@@ -102,17 +102,38 @@
     chdir: "{{ frontend_workdir }}"
   become_user: "{{ app_user }}"
 
-- name: Install EPEL repo (for nginx)
-  ansible.builtin.yum:
-    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-    state: present
-
+# Install Nginx
 - name: Install Nginx
-  ansible.builtin.yum:
-    name: nginx
-    state: present
+  block:
+    - name: Update package cache
+      ansible.builtin.yum:
+        update_cache: yes
+    
+    - name: Check if amazon-linux-extras exists
+      ansible.builtin.stat:
+        path: /usr/bin/amazon-linux-extras
+      register: al_extras
+    
+    - name: Install via amazon-linux-extras if available
+      block:
+        - name: Enable nginx repo
+          ansible.builtin.shell: amazon-linux-extras enable nginx1 -y
+          register: enable_result
+          changed_when: "'already enabled' not in enable_result.stdout"
+        
+        - name: Install nginx
+          ansible.builtin.yum:
+            name: nginx
+            state: present
+            enablerepo: nginx1
+      when: al_extras.stat.exists
+    
+    - name: Install directly if no amazon-linux-extras
+      ansible.builtin.yum:
+        name: nginx
+        state: present
+      when: not al_extras.stat.exists
   become: true
-
 
 
   
