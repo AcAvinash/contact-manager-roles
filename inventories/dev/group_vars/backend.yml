@@ -1,6 +1,7 @@
+# Backend specific dev config
 service_name: backend
 backend_repo_url: "https://github.com/AcAvinash/contact-manager.git"
-backend_branch: "main"
+backend_branch: "develop"  # Dev branch
 backend_subpath: backend
 backend_port: 3000
 
