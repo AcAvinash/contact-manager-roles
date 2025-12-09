@@ -1,0 +1,16 @@
+- name: Check if user exists
+  ansible.builtin.command:
+    cmd: id {{ app_user }}
+  register: user_check
+  ignore_errors: true
+
+- name: Show user check result
+  ansible.builtin.debug:
+    msg: "{{ user_check.rc }}"
+
+- name: Create user if not exist
+  ansible.builtin.user:
+    name: "{{ app_user }}"
+  when: user_check.rc != 0
+
+  

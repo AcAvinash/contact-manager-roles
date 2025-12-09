@@ -1,0 +1,47 @@
+- name: Create application user
+  ansible.builtin.import_role:
+    name: common
+    tasks_from: user-setup
+
+- name: Install NodeJS
+  ansible.builtin.import_role:
+    name: common
+    tasks_from: nodejs
+
+- name: Install PM2 globally
+  npm:
+    name: pm2
+    global: yes
+    state: present
+
+- name: Setup application directory
+  ansible.builtin.import_role:
+    name: common
+    tasks_from: app-setup
+
+- name: Clone backend repository
+  git:
+    repo: "{{ backend_repo_url }}"
+    dest: "{{ app_dir }}/{{ service_name }}"
+    version: "{{ backend_branch }}"
+    force: yes
+
+- name: Set backend working directory dynamically
+  set_fact:
+    backend_workdir: "{{ app_dir }}/{{ service_name }}/{{ backend_subpath }}"
+
+- name: Debug backend path
+  debug:
+    msg: "{{ backend_workdir }}"
+
+- name: Install backend dependencies
+  npm:
+    path: "{{ backend_workdir }}"
+    state: present
+
+- name: Start backend using PM2
+  ansible.builtin.shell: |
+    pm2 stop {{ service_name }} || true
+    pm2 start {{ backend_workdir }}/server.js --name {{ service_name }}
+    pm2 save
+

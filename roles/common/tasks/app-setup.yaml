@@ -1,0 +1,16 @@
+- name: Check if app directory exists
+  ansible.builtin.stat:
+    path: "{{ app_dir }}"
+  register: app_dir_check
+
+- name: Debug result
+  ansible.builtin.debug:
+    msg: "{{ app_dir_check.stat.exists }}"
+
+- name: Create app directory if not exists
+  ansible.builtin.file:
+    path: "{{ app_dir }}"
+    state: directory
+    owner: "{{ app_user }}"
+  when: not app_dir_check.stat.exists
+

@@ -1,0 +1,12 @@
+# ansible/inventories/production/hosts
+[backend]
+backend.acavinash.fun
+
+[backend:vars]
+ansible_user=ec2-user
+ansible_ssh_private_key_file=/tmp/deploy-key.pem
+app_user=appuser
+app_dir=/opt/contact-manager
+git_repo=https://github.com/AcAvinash/Contact-Managers.git
+node_version=18.x
+environment=production

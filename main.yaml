@@ -1,0 +1,7 @@
+- name: Installing contactmanager app
+  hosts: backend
+  become: yes
+  roles:
+    - backend
+
+    

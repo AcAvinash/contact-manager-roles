@@ -1,0 +1,6 @@
+# Host specific configs
+dns_name: backend.acavinash.fun
+
+# For example: specific backend version (optional)
+backend_version: v1
+

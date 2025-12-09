@@ -1,0 +1,31 @@
+# Ignore Ansible vault secrets
+secret/
+
+# Node.js dependencies
+node_modules/
+dist/
+
+# Log files
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python cache (agar Python scripts hai)
+__pycache__/
+*.pyc
+
+# Terraform state files (agar Terraform use kar rahe ho)
+*.tfstate
+*.tfstate.backup
+.terraform/
+
+# Environment files (local testing)
+.env
