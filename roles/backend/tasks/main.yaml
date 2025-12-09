@@ -19,6 +19,12 @@
     name: common
     tasks_from: app-setup
 
+- name: Install git
+  ansible.builtin.package:
+    name: git
+    state: present
+
+
 - name: Clone backend repository
   git:
     repo: "{{ backend_repo_url }}"
