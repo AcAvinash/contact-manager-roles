@@ -102,14 +102,7 @@
     chdir: "{{ frontend_workdir }}"
   become_user: "{{ app_user }}"
 
-
-
-
-#  Install Nginx
-- name: Enable Nginx module
-  ansible.builtin.command: dnf module enable nginx:1.22 -y
-
-
+# Install Nginx
 - name: Install Nginx
   ansible.builtin.yum:
     name: nginx
