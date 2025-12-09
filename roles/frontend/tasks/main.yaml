@@ -82,6 +82,7 @@
     chdir: "{{ frontend_workdir }}"
   become_user: "{{ app_user }}"
 
+
 #  Install Nginx
 - name: Install Nginx
   yum:
