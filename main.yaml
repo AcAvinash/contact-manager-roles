@@ -1,26 +1,21 @@
 ---
-# Backend — needs secrets
-- name: Deploy Backend
-  hosts: backend
-  become: yes
-  vars_files:
-    - secret/secrets.yaml
-  roles:
-    - role: backend
-      tags: 
-        - backend
+- name: Run selected component
+  hosts: localhost
+  gather_facts: no
+  vars:
+    component: "{{ component | default('all') }}"
 
-# Frontend — no secrets needed
-- name: Deploy Frontend
-  hosts: frontend
-  become: yes
-  roles:
-    - role: frontend
-      tags:
-        - frontend
+  tasks:
 
-# secrets required → vault password prompt aayega)
-# ansible-playbook main.yaml -i inventories/dev/hosts.ini --ask-vault-pass --tags backend
+    - name: Run Backend Playbook
+      import_playbook: backend.yaml
+      when: component == "backend" or component == "all"
+
+    - name: Run Frontend Playbook
+      import_playbook: frontend.yaml
+      when: component == "frontend" or component == "all"
+
+
 
 
     

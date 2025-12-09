@@ -1,0 +1,14 @@
+---
+# Backend — needs secrets
+- name: Deploy Backend
+  hosts: backend
+  become: yes
+  vars_files:
+    - secret/secrets.yaml
+  roles:
+    - role: backend
+      tags: 
+        - backend
+
+# secrets required → vault password prompt aayega)
+# ansible-playbook main.yaml -i inventories/dev/hosts.ini --ask-vault-pass --tags backend
