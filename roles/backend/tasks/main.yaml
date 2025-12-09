@@ -64,20 +64,17 @@
     path: "{{ backend_workdir }}"
     state: present
 
-- name: Build TypeScript to JavaScript
-  ansible.builtin.shell: npm run build
+- name: Build TypeScript code
+  ansible.builtin.shell: |
+    ./node_modules/.bin/tsc
   args:
     chdir: "{{ backend_workdir }}"
-  become_user: "{{ app_user }}"
-
 
 - name: Start backend using PM2
   ansible.builtin.shell: |
     pm2 stop {{ service_name }} || true
-    pm2 start dist/server.js --name {{ service_name }}
+    pm2 start {{ backend_workdir }}/dist/server.js --name {{ service_name }} --update-env
     pm2 save
-  args:
-    chdir: "{{ backend_workdir }}"
-    executable: /bin/bash
+
 
 
