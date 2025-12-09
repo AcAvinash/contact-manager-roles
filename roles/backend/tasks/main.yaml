@@ -66,6 +66,19 @@
     name: secrets
   no_log: false
 
+- name: Debug - Check secrets variable
+  debug:
+    msg: "Secrets variable exists: {{ secrets is defined }}"
+
+- name: Debug - Show template path
+  debug:
+    msg: "Template src: {{ playbook_dir }}/roles/backend/templates/env.j2"
+
+- name: Debug - Show secrets keys (careful - shows values)
+  debug:
+    msg: "Secrets keys: {{ secrets.keys() | list }}"
+  no_log: false  # Temporary - this will show values!
+
 - name: Create .env file using template
   template:
     src: env.j2
