@@ -75,6 +75,7 @@
 - name: Set frontend working directory
   set_fact:
     frontend_workdir: "{{ app_dir }}"
+  become_user: "{{ app_user }}"
 
 - name: Build React App
   command: npm run build
