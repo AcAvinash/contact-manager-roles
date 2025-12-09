@@ -1,0 +1,19 @@
+
+server {
+    listen 80;
+    server_name frontend.acavinash.fun;
+
+    root {{ app_dir }}/build;
+    index index.html;
+
+    location / {
+        try_files $uri /index.html;
+    }
+
+    # React frontend calls backend using /api/
+    location /api/ {
+        proxy_pass http://backend.acavinash.fun:9000/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}

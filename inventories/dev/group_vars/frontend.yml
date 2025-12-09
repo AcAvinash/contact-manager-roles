@@ -1,0 +1,5 @@
+service_name: frontend
+frontend_repo_url: "https://github.com/AcAvinash/contact-manager.git"
+frontend_branch: "main"
+frontend_subpath: backend
+frontend_port: 3000

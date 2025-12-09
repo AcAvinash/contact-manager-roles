@@ -1,12 +1,26 @@
-- name: Installing contactmanager app
+---
+# Backend — needs secrets
+- name: Deploy Backend
   hosts: backend
   become: yes
-
   vars_files:
     - secret/secrets.yaml
-
   roles:
-    - backend
+    - role: backend
+      tags: 
+        - backend
+
+# Frontend — no secrets needed
+- name: Deploy Frontend
+  hosts: frontend
+  become: yes
+  roles:
+    - role: frontend
+      tags:
+        - frontend
+
+# secrets required → vault password prompt aayega)
+# ansible-playbook main.yaml -i inventories/dev/hosts.ini --ask-vault-pass --tags backend
 
 
     

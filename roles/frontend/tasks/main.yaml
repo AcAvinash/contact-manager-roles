@@ -1,0 +1,69 @@
+
+# Create swap file (2 GB) to avoid memory issues during build
+- name: Create swap file
+  ansible.builtin.shell: |
+    dd if=/dev/zero of=/swapfile bs=1M count=2048
+    chmod 600 /swapfile
+    mkswap /swapfile
+    swapon /swapfile
+  args:
+    warn: false
+
+
+
+- name: Create application user
+  ansible.builtin.import_role:
+    name: common
+    tasks_from: user-setup
+
+- name: Setup application directory
+  ansible.builtin.import_role:
+    name: common
+    tasks_from: app-setup
+
+
+- name: Install NodeJS
+  ansible.builtin.import_role:
+    name: common
+    tasks_from: nodejs
+
+- name: Remove old node_modules
+  file:
+    path: "{{ app_dir }}/node_modules"
+    state: absent
+  become_user: "{{ app_user }}"
+
+- name: Clean npm cache
+  command: npm cache clean --force
+  become_user: "{{ app_user }}"
+
+- name: Clone backend repo to temp directory
+  git:
+    repo: "{{ backend_repo_url }}"
+    dest: "/tmp/contact-manager"
+    version: "{{ backend_branch }}"
+    force: yes
+
+- name: Ensure /app/backend exists
+  file:
+    path: "{{ app_dir }}"
+    state: directory
+
+- name: Build React App
+  command: npm run build
+  args:
+    chdir: "{{ app_dir }}"
+  become_user: "{{ app_user }}"
+
+#  Install Nginx
+- name: Install Nginx
+  yum:
+    name: nginx
+    state: present
+
+- name: Configure Nginx for Frontend
+  template:
+    src: frontend.j2
+    dest: /etc/nginx/conf.d/frontend.conf
+    mode: '0644'
+  notify: Restart Nginx
