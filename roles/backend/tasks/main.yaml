@@ -70,10 +70,14 @@
     chdir: "{{ backend_workdir }}"
   become_user: "{{ app_user }}"
 
-  
+
 - name: Start backend using PM2
   ansible.builtin.shell: |
     pm2 stop {{ service_name }} || true
-    pm2 start {{ backend_workdir }}/server.js --name {{ service_name }}
+    pm2 start dist/server.js --name {{ service_name }}
     pm2 save
+  args:
+    chdir: "{{ backend_workdir }}"
+    executable: /bin/bash
+
 
