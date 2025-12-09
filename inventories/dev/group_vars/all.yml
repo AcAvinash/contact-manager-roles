@@ -1,6 +1,3 @@
-# Common for all dev servers
 app_user: roboshop
 app_dir: /app
 node_version: "18"
-app_env: "development"
-debug_mode: true
