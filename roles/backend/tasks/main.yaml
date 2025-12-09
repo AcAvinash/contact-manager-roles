@@ -62,7 +62,7 @@
 
 - name: Decrypt secrets.yaml
   include_vars:
-    file: "../../secrets/secrets.yaml"
+    file: "/home/ec2-user/contact-manager-roles/secrets/secrets.yaml"
     name: secrets
   no_log: false
 
