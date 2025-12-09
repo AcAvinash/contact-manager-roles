@@ -83,13 +83,27 @@
   template:
     src: env.j2
     dest: "{{ backend_workdir }}/.env"
-    owner: "{{ app_user }}"  # Yeh add karo
-    group: "{{ app_user }}"  # Yeh add karo
-    mode: "0640"  # Change to 0640
+    mode: "0600"
     force: yes
   vars:
     secrets: "{{ secrets }}"
-  notify: Restart backend       
+  notify: Restart backend
+  register: template_result  # <-- Yeh add karo
+
+# DEBUG TASKS ↓↓↓
+- name: Debug - Show template task result
+  debug:
+    var: template_result
+  when: template_result is defined
+
+- name: Debug - Check if .env exists after template task
+  stat:
+    path: "{{ backend_workdir }}/.env"
+  register: env_check
+  
+- name: Debug - Show if .env created
+  debug:
+    msg: ".env created: {{ env_check.stat.exists }}"     
 
 - name: Build TypeScript code
   ansible.builtin.shell: "./node_modules/.bin/tsc"
