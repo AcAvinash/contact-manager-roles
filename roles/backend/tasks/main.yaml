@@ -43,7 +43,8 @@
     state: directory
 
 - name: Move backend folder from temp to /app/backend
-  command: mv /tmp/contact-manager/backend "{{ app_dir }}"
+  command: rsync -a /tmp/contact-manager/backend/ "{{ app_dir }}"
+
 
 - name: Remove temp repo folder
   file:
