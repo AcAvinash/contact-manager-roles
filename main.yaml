@@ -1,5 +1,5 @@
 ---
-- name: Run selected component
+- name: Component Dispatcher
   hosts: localhost
   gather_facts: no
   vars:
@@ -7,13 +7,14 @@
 
   tasks:
 
-    - name: Run Backend Playbook
-      import_playbook: backend.yaml
+    - name: Run backend component
+      include_tasks: components/backend.yaml
       when: component == "backend" or component == "all"
 
-    - name: Run Frontend Playbook
-      import_playbook: frontend.yaml
+    - name: Run frontend component
+      include_tasks: components/frontend.yaml
       when: component == "frontend" or component == "all"
+
 
 
 
