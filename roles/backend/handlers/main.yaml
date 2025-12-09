@@ -1,15 +1,9 @@
-
+# roles/backend/handlers/main.yml
 - name: Restart backend
-  become: true
-  become_user: "{{ app_user }}"
-  shell: |
-    pm2 describe backend > /dev/null 2>&1
-    if [ $? -eq 0 ]; then
-        pm2 restart backend --update-env
-    else
-        pm2 start server.js --name backend --env production
-    fi
+  ansible.builtin.shell: |
+    pm2 restart backend --update-env || pm2 start {{ backend_workdir }}/server.js --name backend --update-env
   args:
     chdir: "{{ backend_workdir }}"
+  become_user: "{{ app_user }}"
  
   
