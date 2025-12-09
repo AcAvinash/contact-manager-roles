@@ -1,3 +1,5 @@
+---
+
 - name: Create application user
   ansible.builtin.import_role:
     name: common
@@ -29,7 +31,6 @@
     path: "{{ app_dir }}/{{ service_name }}/{{ backend_subpath }}"
     state: absent
 
-
 - name: Clone backend repo to temp directory
   git:
     repo: "{{ backend_repo_url }}"
@@ -45,7 +46,6 @@
 - name: Move backend folder from temp to /app/backend
   command: rsync -a /tmp/contact-manager/backend/ "{{ app_dir }}"
 
-
 - name: Remove temp repo folder
   file:
     path: /tmp/contact-manager
@@ -55,25 +55,34 @@
   set_fact:
     backend_workdir: "{{ app_dir }}"
 
-- name: Debug backend path
-  debug:
-    msg: "{{ backend_workdir }}"
-
 - name: Install backend dependencies
   npm:
     path: "{{ backend_workdir }}"
     state: present
 
+- name: Decrypt secrets.yaml
+  include_vars:
+    file: "secrets/secrets.yaml"
+    name: secrets
+  no_log: true
+
+- name: Create .env file using template
+  template:
+    src: env.j2
+    dest: "{{ backend_workdir }}/.env"
+    mode: "0600"
+  vars:
+    secrets: "{{ secrets }}"
+  notify: Restart backend          
+
 - name: Build TypeScript code
-  ansible.builtin.shell: |
-    ./node_modules/.bin/tsc
+  ansible.builtin.shell: "./node_modules/.bin/tsc"
   args:
     chdir: "{{ backend_workdir }}"
 
-
 - name: Check if server.js exists
   stat:
-    path: "{{ app_dir }}/server.js"
+    path: "{{ backend_workdir }}/server.js"
   register: server_file_js
 
 - name: Start or restart backend using PM2
@@ -85,7 +94,7 @@
         pm2 start server.js --name backend --env production
     fi
   args:
-    chdir: "{{ app_dir }}"
+    chdir: "{{ backend_workdir }}"
   become_user: "{{ app_user }}"
   when: server_file_js.stat.exists
 
