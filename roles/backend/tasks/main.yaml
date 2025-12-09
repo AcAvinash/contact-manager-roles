@@ -62,7 +62,7 @@
 
 - name: Decrypt secrets.yaml
   include_vars:
-    file: "/home/ec2-user/contact-manager-roles/secrets/secrets.yaml"
+    file: "{{ playbook_dir }}/secret/secrets.yaml"
     name: secrets
   no_log: false
 
