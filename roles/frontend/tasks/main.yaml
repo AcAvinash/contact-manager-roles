@@ -43,22 +43,34 @@
     name: git
     state: present
 
-- name: Clone frontend repo to temp directory
+- name: Clone backend repo to temp directory
   git:
     repo: "{{ frontend_repo_url }}"
     dest: "/tmp/contact-manager"
     version: "{{ frontend_branch }}"
     force: yes
 
-- name: Ensure /app/frontend exists
+- name: Ensure /app exists
   file:
     path: "{{ app_dir }}"
     state: directory
 
+- name: Move backend folder from temp to /app
+  command: rsync -a /tmp/contact-manager/frontend/ "{{ app_dir }}"
+
+- name: Remove temp repo folder
+  file:
+    path: /tmp/contact-manager
+    state: absent
+
+- name: Set frontend working directory
+  set_fact:
+    frontend_workdir: "{{ app_dir }}"
+
 - name: Build React App
   command: npm run build
   args:
-    chdir: "{{ app_dir }}"
+    chdir: "{{ frontend_workdir }}"
   become_user: "{{ app_user }}"
 
 #  Install Nginx
