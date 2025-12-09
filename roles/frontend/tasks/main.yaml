@@ -66,6 +66,7 @@
 
 - name: Move client folder from temp to /app
   command: rsync -a /tmp/contact-manager/client/ "{{ app_dir }}"
+  become_user: "{{ app_user }}"
 
 - name: Remove temp repo folder
   file:
@@ -77,11 +78,18 @@
     frontend_workdir: "{{ app_dir }}"
   become_user: "{{ app_user }}"
 
+- name: Install frontend dependencies
+  npm:
+    path: "{{ frontend_workdir }}"
+    state: present
+  become_user: "{{ app_user }}"
+
 - name: Build React App
   command: npm run build
   args:
     chdir: "{{ frontend_workdir }}"
   become_user: "{{ app_user }}"
+
 
 
 #  Install Nginx
