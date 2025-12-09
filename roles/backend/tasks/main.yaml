@@ -24,6 +24,11 @@
     name: git
     state: present
 
+- name: Remove old backend folder
+  file:
+    path: "{{ app_dir }}/{{ service_name }}/{{ backend_subpath }}"
+    state: absent
+
 
 - name: Clone backend repo to temp directory
   git:
