@@ -1,5 +1,4 @@
 ---
-
 - name: Create application user
   ansible.builtin.import_role:
     name: common
@@ -26,10 +25,19 @@
     name: git
     state: present
 
-- name: Remove old backend folder
+- name: Remove old application files
   file:
-    path: "{{ app_dir }}/{{ service_name }}/{{ backend_subpath }}"
+    path: "{{ app_dir }}/"
     state: absent
+  when: cleanup_old | default(false)
+
+- name: Create app directory
+  file:
+    path: "{{ app_dir }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0755'
 
 - name: Clone backend repo to temp directory
   git:
@@ -38,13 +46,15 @@
     version: "{{ backend_branch }}"
     force: yes
 
-- name: Ensure /app/backend exists
-  file:
-    path: "{{ app_dir }}"
-    state: directory
-
-- name: Move backend folder from temp to /app/backend
-  command: rsync -a /tmp/contact-manager/backend/ "{{ app_dir }}"
+- name: Copy only backend folder to app directory
+  synchronize:
+    src: "/tmp/contact-manager/backend/"
+    dest: "{{ app_dir }}/"
+    delete: yes
+    rsync_opts:
+      - "--exclude=node_modules"
+      - "--exclude=.git"
+  become_user: "{{ app_user }}"
 
 - name: Remove temp repo folder
   file:
@@ -55,47 +65,99 @@
   set_fact:
     backend_workdir: "{{ app_dir }}"
 
+- name: Load encrypted secrets
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/secret/secrets.yaml"
+    name: secrets
+  no_log: true
+
+- name: Debug - Check if secrets loaded (temporarily)
+  ansible.builtin.debug:
+    msg: "Secrets loaded successfully: {{ secrets.keys() | list }}"
+  when: debug_mode | default(false)
+  no_log: false  # Only for debugging
+
+- name: Create .env file using template
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ backend_workdir }}/.env"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: "0640"
+  notify: Restart backend
+
+- name: Verify .env file creation
+  ansible.builtin.stat:
+    path: "{{ backend_workdir }}/.env"
+  register: env_file_check
+
+- name: Show .env file location
+  ansible.builtin.debug:
+    msg: ".env file created at: {{ env_file_check.stat.path }} (exists: {{ env_file_check.stat.exists }})"
+
 - name: Install backend dependencies
   npm:
     path: "{{ backend_workdir }}"
     state: present
+  become_user: "{{ app_user }}"
 
-- name: Decrypt secrets.yaml
-  include_vars:
-    file: "{{ playbook_dir }}/secret/secrets.yaml"
-    name: secrets
-  no_log: false
+- name: Check package.json for build script
+  ansible.builtin.stat:
+    path: "{{ backend_workdir }}/package.json"
+  register: package_json_file
 
-- name: Create .env file using template
-  template:
-    src: env.j2
-    dest: "{{ backend_workdir }}/.env"
-    mode: "0600"
-  vars:
-    secrets: "{{ secrets }}"
-  notify: Restart backend          
+- name: Read package.json
+  ansible.builtin.set_fact:
+    package_json: "{{ lookup('file', backend_workdir + '/package.json') | from_json }}"
+  when: package_json_file.stat.exists
 
-- name: Build TypeScript code
-  ansible.builtin.shell: "./node_modules/.bin/tsc"
+- name: Build TypeScript code (using npm run build)
+  ansible.builtin.shell: "npm run build"
   args:
     chdir: "{{ backend_workdir }}"
+  become_user: "{{ app_user }}"
+  when: package_json_file.stat.exists and "'build' in package_json.scripts"
+
+- name: Build TypeScript code (using tsc directly)
+  ansible.builtin.shell: "npx tsc"
+  args:
+    chdir: "{{ backend_workdir }}"
+  become_user: "{{ app_user }}"
+  when: package_json_file.stat.exists and "not ('build' in package_json.scripts)"
 
 - name: Check if server.js exists
-  stat:
+  ansible.builtin.stat:
     path: "{{ backend_workdir }}/server.js"
   register: server_file_js
 
 - name: Start or restart backend using PM2
-  shell: |
-    pm2 describe backend > /dev/null 2>&1
-    if [ $? -eq 0 ]; then
+  ansible.builtin.shell: |
+    export NVM_DIR="/home/{{ app_user }}/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    if pm2 describe backend > /dev/null 2>&1; then
         pm2 restart backend --update-env
     else
-        pm2 start server.js --name backend --env production
+        pm2 start server.js --name backend
     fi
   args:
     chdir: "{{ backend_workdir }}"
   become_user: "{{ app_user }}"
   when: server_file_js.stat.exists
+
+- name: Save PM2 process list
+  ansible.builtin.shell: "pm2 save"
+  args:
+    chdir: "{{ backend_workdir }}"
+  become_user: "{{ app_user }}"
+  when: server_file_js.stat.exists
+
+- name: Setup PM2 startup on boot
+  ansible.builtin.shell: "pm2 startup"
+  args:
+    chdir: "{{ backend_workdir }}"
+  become_user: "{{ app_user }}"
+  when: server_file_js.stat.exists
+  changed_when: false
+  register: pm2_startup
 
 
