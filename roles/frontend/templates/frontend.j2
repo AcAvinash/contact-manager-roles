@@ -1,8 +1,8 @@
 
 server {
-    listen 80;
-    server_name frontend.acavinash.fun;
-
+    listen 80 default_server;
+    server_name frontend.acavinash.fun www.frontend.acavinash.fun;
+    
     root {{ app_dir }}/build;
     index index.html;
 

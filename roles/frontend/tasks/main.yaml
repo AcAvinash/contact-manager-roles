@@ -121,6 +121,11 @@
     state: started
     enabled: yes
 
+- name: Disable default nginx site
+  file:
+    path: /usr/share/nginx/html/index.html
+    state: absent
+
 # Configure Nginx for frontend
 - name: Configure Nginx for Frontend
   template:
@@ -128,5 +133,11 @@
     dest: /etc/nginx/conf.d/frontend.conf
     mode: '0644'
   notify: Restart Nginx
+
+- name: Ensure Nginx is running
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: yes
 
 
