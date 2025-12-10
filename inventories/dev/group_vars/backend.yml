@@ -1,5 +1,5 @@
 service_name: backend
-backend_repo_url: "https://github.com/AcAvinash/contact-manager.git"
+backend_repo_url: "https://github.com/AlankarSingh27/Contact-Manager.git"
 backend_branch: "main"
 backend_subpath: backend
 backend_port: 3000

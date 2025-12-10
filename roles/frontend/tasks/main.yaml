@@ -66,7 +66,7 @@
 # Fix permissions of temp repo for roboshop
 - name: Fix permissions of temp repo
   file:
-    path: /tmp/contact-manager
+    path: /tmp/Contact-Manager
     state: directory
     recurse: yes
     owner: "{{ app_user }}"
@@ -74,13 +74,13 @@
 
 # Move client folder from temp to /app
 - name: Move client folder to /app
-  command: rsync -a /tmp/contact-manager/client/ "{{ app_dir }}"
+  command: rsync -a /tmp/Contact-Manager/Frontend/ "{{ app_dir }}"
   become_user: "{{ app_user }}"
 
 # Remove temp folder
 - name: Remove temp repo folder
   file:
-    path: /tmp/contact-manager
+    path: /tmp/Contact-Manager
     state: absent
 
 # Set frontend_workdir

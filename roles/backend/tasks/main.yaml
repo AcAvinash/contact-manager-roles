@@ -38,7 +38,7 @@
 - name: Clone backend repo to temp directory
   git:
     repo: "{{ backend_repo_url }}"
-    dest: "/tmp/contact-manager"
+    dest: "/tmp/Contact-Manager"
     version: "{{ backend_branch }}"
     force: yes
 
@@ -48,11 +48,11 @@
     state: directory
 
 - name: Move backend folder from temp to /app
-  command: rsync -a /tmp/contact-manager/backend/ "{{ app_dir }}"
+  command: rsync -a /tmp/Contact-Manager/backend/ "{{ app_dir }}"
 
 - name: Remove temp repo folder
   file:
-    path: /tmp/contact-manager
+    path: /tmp/Contact-Manager
     state: absent
 
 - name: Set backend working directory
