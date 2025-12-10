@@ -51,7 +51,7 @@
 - name: Clone frontend repo to temp directory
   git:
     repo: "{{ frontend_repo_url }}"
-    dest: "/tmp/contact-manager"
+    dest: "/tmp/Contact-Manager"
     version: "{{ frontend_branch }}"
     force: yes
 
