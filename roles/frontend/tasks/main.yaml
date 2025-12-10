@@ -89,9 +89,9 @@
     dest: "{{ app_dir }}/.env"
     content: |
       REACT_APP_EXPRESS_SERVER_URL={{ frontend_env.REACT_APP_EXPRESS_SERVER_URL }}
-  owner: "{{ app_user }}"
-  group: "{{ app_user }}"
-  mode: '0644'
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0644'
 
 # Set frontend workdir
 - name: Set frontend working directory
