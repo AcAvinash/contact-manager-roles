@@ -3,3 +3,5 @@ frontend_repo_url: "https://github.com/AlankarSingh27/Contact-Manager.git"
 frontend_branch: "main"
 frontend_subpath: Frontend
 frontend_port: 80
+frontend_env:
+  REACT_APP_EXPRESS_SERVER_URL: "/api"
