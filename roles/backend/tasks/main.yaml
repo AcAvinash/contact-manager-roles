@@ -87,6 +87,8 @@
   template:
     src: env.j2
     dest: "{{ backend_workdir }}/.env"
+    owner: roboshop
+    group: roboshop
     mode: "0600"
     force: yes
   vars:
