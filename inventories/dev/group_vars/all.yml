@@ -3,7 +3,7 @@ app_dir: /app
 node_version: "18"
 
 # Monitoring
-monitoring_user: roboshop
+
 monitoring_dir: /opt/monitoring
 prometheus_port: 9090
 grafana_port: 3000

@@ -1,8 +1,13 @@
-- name: Installing contactmanager app
+- name: Run common tasks for all components
+  hosts: "{{ component }}"
+  become: yes
+  roles:
+    - common
+
+- name: Run component-specific tasks
   hosts: "{{ component }}"
   become: yes
   roles:
     - "{{ component }}"
-
 
     

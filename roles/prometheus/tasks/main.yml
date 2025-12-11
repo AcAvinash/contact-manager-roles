@@ -2,7 +2,7 @@
   file:
     path: "{{ monitoring_dir }}"
     state: directory
-    owner: "{{ monitoring_user }}"
+    owner: "{{ app_user }}"
     mode: 0755
 
 - name: Download Prometheus
