@@ -1,6 +1,6 @@
 
 - name: Load alertmanager secrets
-  include_vars: "{{ playbook_dir }}/secret/alertmanager_secrets.yaml"
+  include_vars: "{{ playbook_dir }}/secret/gmail.yaml"
   when: load_alertmanager_vault | default(false)
 
 - name: Download Alertmanager
