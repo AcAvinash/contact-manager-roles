@@ -1,0 +1,68 @@
+
+- name: Load alertmanager secrets
+  include_vars: "{{ playbook_dir }}/secret/alertmanager_secrets.yaml"
+  when: load_alertmanager_vault | default(false)
+
+- name: Download Alertmanager
+  get_url:
+    url: "https://github.com/prometheus/alertmanager/releases/download/v0.27.0/alertmanager-0.27.0.linux-amd64.tar.gz"
+    dest: /tmp/alertmanager.tar.gz
+
+- name: Extract Alertmanager
+  unarchive:
+    src: /tmp/alertmanager.tar.gz
+    dest: /opt
+    remote_src: yes
+
+- name: Move Alertmanager folder
+  command: mv /opt/alertmanager-0.27.0.linux-amd64 /opt/alertmanager
+  args:
+    removes: /opt/alertmanager
+
+- name: Create alertmanager config directory
+  file:
+    path: /opt/alertmanager
+    state: directory
+    mode: '0755'
+
+- name: Upload alertmanager.yml
+  copy:
+    dest: /opt/alertmanager/alertmanager.yml
+    content: |
+      global:
+        smtp_smarthost: 'smtp.gmail.com:587'
+        smtp_from: '{{ gmail_from }}'
+        smtp_auth_username: '{{ gmail_from }}'
+        smtp_auth_password: '{{ gmail_app_password }}'
+
+      route:
+        receiver: 'gmail-alerts'
+
+      receivers:
+        - name: 'gmail-alerts'
+          email_configs:
+            - to: '{{ gmail_to }}'
+              send_resolved: true
+
+- name: Create Alertmanager systemd service
+  copy:
+    dest: /etc/systemd/system/alertmanager.service
+    content: |
+      [Unit]
+      Description=Alertmanager Service
+      After=network.target
+
+      [Service]
+      ExecStart=/opt/alertmanager/alertmanager \
+        --config.file=/opt/alertmanager/alertmanager.yml \
+        --storage.path=/opt/alertmanager/data
+      Restart=always
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Start Alertmanager
+  systemd:
+    name: alertmanager
+    enabled: yes
+    state: started

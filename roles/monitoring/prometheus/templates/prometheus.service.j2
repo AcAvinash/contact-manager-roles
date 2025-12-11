@@ -1,0 +1,12 @@
+[Unit]
+Description=Prometheus Monitoring
+After=network.target
+
+[Service]
+ExecStart={{ monitoring_dir }}/prometheus \
+  --config.file={{ prometheus_config_path }}
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
