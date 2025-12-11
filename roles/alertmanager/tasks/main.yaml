@@ -5,7 +5,7 @@
 
 - name: Check if gmail secrets loaded
   debug:
-    var: gmail_to
+    var: gmail_from
 
 - name: Download Alertmanager
   get_url:
