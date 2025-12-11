@@ -1,9 +1,15 @@
+- name: Ensure application user exists
+  ansible.builtin.import_role:
+    name: common
+    tasks_from: user-setup
+
 - name: Create monitoring directory
-  file:
+  ansible.builtin.file:
     path: "{{ monitoring_dir }}"
     state: directory
     owner: "{{ app_user }}"
-    mode: 0755
+    group: "{{ app_user }}"
+    mode: '0755'
 
 - name: Download Prometheus
   get_url:
