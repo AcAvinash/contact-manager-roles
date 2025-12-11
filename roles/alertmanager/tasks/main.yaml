@@ -3,6 +3,10 @@
   include_vars: "{{ playbook_dir }}/secret/gmail.yaml"
   when: load_alertmanager_vault | default(false)
 
+- name: Check if gmail secrets loaded
+  debug:
+    var: gmail_to
+
 - name: Download Alertmanager
   get_url:
     url: "https://github.com/prometheus/alertmanager/releases/download/v0.27.0/alertmanager-0.27.0.linux-amd64.tar.gz"
