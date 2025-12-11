@@ -12,6 +12,11 @@ scrape_configs:
       - targets:
         - "backend.acavinash.fun:9100"
 
+# if we want to loop {% for host in groups['nodes'] %}
+ # - "{{ hostvars[host].inventory_hostname }}:9100"
+#  {% endfor %}
+
+
 alerting:
   alertmanagers:
     - static_configs:
