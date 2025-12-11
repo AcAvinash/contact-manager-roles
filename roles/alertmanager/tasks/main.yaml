@@ -12,6 +12,11 @@
     url: "https://github.com/prometheus/alertmanager/releases/download/v0.27.0/alertmanager-0.27.0.linux-amd64.tar.gz"
     dest: /tmp/alertmanager.tar.gz
 
+- name: Remove existing alertmanager folder if exists
+  file:
+    path: /opt/alertmanager
+    state: absent
+
 - name: Extract Alertmanager
   unarchive:
     src: /tmp/alertmanager.tar.gz
@@ -20,14 +25,13 @@
 
 - name: Move Alertmanager folder
   command: mv /opt/alertmanager-0.27.0.linux-amd64 /opt/alertmanager
-  args:
-    removes: /opt/alertmanager
 
 - name: Create alertmanager config directory
   file:
     path: /opt/alertmanager
     state: directory
     mode: '0755'
+
 
 - name: Upload alertmanager.yml
   copy:
